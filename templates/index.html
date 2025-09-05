@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сканер штрихкодов</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Коробка: <span id="box-number">{{ current_box.box_number if current_box else '' }}</span></h2>
+      <div class="controls">
+        <button id="clear-btn" class="btn btn-clear">Очистить</button>
+        <button id="seal-btn" class="btn btn-seal">Закрыть коробку</button>
+      </div>
+      <h3>Распознанные штрихкоды:</h3>
+      <div class="barcodes-list">
+        <ul id="barcodes-container"></ul>
+      </div>
+    </div>
+
+    <div class="camera-view">
+      <h2>Веб-камера</h2>
+      <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    </div>
+  </div>
+
+  <script>
+    function updateBarcodes() {
+      fetch('/get_barcodes')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('box-number').textContent = data.box_number || 'Новая коробка';
+
+          const container = document.getElementById('barcodes-container');
+          container.innerHTML = '';
+
+          data.barcodes.forEach(barcode => {
+            const li = document.createElement('li');
+            li.textContent = barcode;
+            container.appendChild(li);
+          });
+
+          // Обновляем состояние кнопок
+          document.getElementById('seal-btn').disabled = data.is_sealed;
+        });
+    }
+
+    document.getElementById('clear-btn').addEventListener('click', function () {
+      if (confirm('Вы уверены, что хотите закрыть эту коробку?')) {
+        fetch('/clear_box', { method: 'POST' })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              updateBarcodes();
+            }
+          });
+      }
+    });
+
+    document.getElementById('seal-btn').addEventListener('click', function () {
+      if (confirm('Вы уверены, что хотите закрыть эту коробку?')) {
+        fetch('/seal_box', { method: 'POST' })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert(`Коробка закрыта! Номер: ${data.box_number}`);
+              updateBarcodes();
+            }
+          });
+      }
+    });
+
+    // Обновляем список каждые 2 секунды
+    setInterval(updateBarcodes, 2000);
+    updateBarcodes(); // Первоначальная загрузка
+  </script>
+</body>
+
+</html>

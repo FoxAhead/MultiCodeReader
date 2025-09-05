@@ -1,0 +1,17 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "app" (
+	"param"	TEXT NOT NULL,
+	"value"	TEXT,
+	PRIMARY KEY("param")
+);
+CREATE TABLE IF NOT EXISTS "box_codes" (
+	"box_id"	INTEGER NOT NULL,
+	"code"	TEXT NOT NULL,
+	PRIMARY KEY("box_id","code")
+);
+CREATE TABLE IF NOT EXISTS "boxes" (
+	"box_id"	INTEGER NOT NULL,
+	"closed"	INTEGER NOT NULL,
+	PRIMARY KEY("box_id")
+);
+COMMIT;
