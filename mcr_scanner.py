@@ -2,8 +2,8 @@ from dataclasses import dataclass
 import zxingcpp
 import cv2
 import numpy as np
-# from camera_opencv import Camera
-from camera_file import Camera
+from camera_opencv import Camera
+# from camera_file import Camera
 
 
 @dataclass
