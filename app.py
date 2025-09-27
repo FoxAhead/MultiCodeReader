@@ -1,5 +1,7 @@
 from contextlib import contextmanager
 from flask import Flask, render_template, Response, jsonify
+
+from camera_opencv import Camera
 from mcr_scanner import Scanner
 import models
 import cv2
@@ -75,7 +77,7 @@ def index():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(get_frame(Scanner()), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(get_frame(Scanner(Camera())), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/get_barcodes')
@@ -107,4 +109,4 @@ def seal_box():
 
 if __name__ == '__main__':
     init_database()
-    app.run(debug=True, threaded=True)
+    app.run(debug=True)

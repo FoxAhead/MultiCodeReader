@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сканер штрихкодов</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="{{ url_for('static', filename='capture.js') }}"></script>
+</head>
+
+<body>
+  <div id="debugconsole"></div>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Коробка: <span id="box-number">{{ current_box.box_number if current_box else '' }}</span></h2>
+      <div class="controls">
+        <button id="clear-btn" class="btn btn-clear">Очистить</button>
+        <button id="seal-btn" class="btn btn-seal">Закрыть коробку</button>
+      </div>
+      <h3>Распознанные штрихкоды:</h3>
+      <div class="barcodes-list">
+        <ul id="barcodes-container"></ul>
+      </div>
+    </div>
+    <div class="camera-view">
+      <h2>Камера телефона</h2>
+      <video id="video">Video stream not available.</video>
+      <!-- <img src="{{ url_for('video_feed') }}" width="640" height="480"> -->
+      <button id="capture-button" class="btn">Capture photo</button>
+    </div>
+    <canvas id="canvas"></canvas>
+  </div>
+</body>
+
+</html>

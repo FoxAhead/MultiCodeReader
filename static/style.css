@@ -94,3 +94,18 @@ body {
   color: #666;
   font-size: 14px;
 }
+
+#video {
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px black;
+  width: 100%;
+  height: auto;
+  max-height: 50vh;
+  border-radius: 5px;
+  background: #000;
+  object-fit: contain;
+}
+
+#canvas {
+  display: none;
+}

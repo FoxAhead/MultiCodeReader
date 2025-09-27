@@ -2,13 +2,12 @@ from dataclasses import dataclass
 import zxingcpp
 import cv2
 import numpy as np
-from camera_opencv import Camera
-# from camera_file import Camera
 
 
 @dataclass
 class ScannerCode:
     text: str = ''
+    format: zxingcpp.BarcodeFormat = None
 
 
 class ScannerFrame:
@@ -18,18 +17,22 @@ class ScannerFrame:
 
 
 class Scanner:
-    def __init__(self):
-        self.camera = Camera()
+    def __init__(self, camera=None):
+        self.camera = camera
 
     def get_frame(self):
+        return self.get_frame_by_image(self.camera.get_frame().copy())
+
+    def get_frame_by_image(self, image):
         scanner_frame = ScannerFrame()
-        scanner_frame.image = self.camera.get_frame().copy()
+        scanner_frame.image = image
         barcodes = zxingcpp.read_barcodes(scanner_frame.image)
         scanner_frame.codes.clear()
         for barcode in barcodes:
             self.draw_bounding_box(scanner_frame.image, barcode)
-            scanner_frame.codes.append(ScannerCode(text=barcode.text))
-        #print(type(scanner_frame.image), len(barcodes), scanner_frame.codes)
+            scanner_frame.codes.append(ScannerCode(text=barcode.text, format=barcode.format))
+            print(barcode.format, barcode.text, barcode.ec_level, barcode.error)
+        #print(len(barcodes), scanner_frame.codes)
         return scanner_frame
 
     def draw_bounding_box(self, cv2_image, barcode: zxingcpp.Result):
