@@ -9,6 +9,8 @@ import models
 import cv2
 from flask_socketio import SocketIO, emit
 from base64 import b64decode
+import qrcode
+import socket
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///barcode_scanner.db'
@@ -123,7 +125,6 @@ def handle_frame_data(data):
         # Извлекаем base64 данные изображения
         image_data = data['image']
         resolution = data['resolution']
-        print(resolution)
 
         # Убираем префикс data:image/jpeg;base64, если есть
         if ',' in image_data:
@@ -133,6 +134,8 @@ def handle_frame_data(data):
         img_bytes = b64decode(image_data)
         nparr = np.frombuffer(img_bytes, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        print("%d bytes; resolution: %s" % (len(img_bytes), resolution))
 
         if img is None:
             #emit('processing_error', {'error': 'Не удалось декодировать изображение'})
@@ -193,14 +196,30 @@ def handle_frame_data(data):
 
 
 def emit_update_barcodes():
-    with app_context():
-        emit('update_barcodes', {
-            'barcodes': sorted(detected_barcodes),
-            'box_number': current_box.box_number if current_box else None,
-            'is_sealed': current_box.is_sealed if current_box else False
-        })
+    socketio.emit('update_barcodes', {
+        'barcodes': sorted(detected_barcodes),
+        'box_number': current_box.box_number if current_box else None,
+        'is_sealed': current_box.is_sealed if current_box else False
+    })
+
+
+def get_local_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception as e:
+        return "127.0.0.1"
 
 
 if __name__ == '__main__':
     init_database()
+    ip = get_local_ip()
+    url = f"https://{ip}:5000"
+    print(url)
+    qr = qrcode.QRCode()
+    qr.add_data(url)
+    qr.print_ascii()
     app.run(debug=True, host='0.0.0.0', ssl_context=('cert.pem', 'key.pem'))

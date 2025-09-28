@@ -39,8 +39,9 @@
     navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
-        width: { ideal: 2048 },
-        height: { ideal: 2048 },
+        width: { ideal: 5000 },
+        height: { ideal: 5000 },
+        frameRate: { ideal: 15 },
         facingMode: { exact: "environment" },
       }
     })

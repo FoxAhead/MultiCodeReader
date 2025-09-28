@@ -3,6 +3,8 @@ import zxingcpp
 import cv2
 import numpy as np
 
+FORMATS = zxingcpp.BarcodeFormat.DataMatrix | zxingcpp.BarcodeFormat.EAN13 | zxingcpp.BarcodeFormat.QRCode
+
 
 @dataclass
 class ScannerCode:
@@ -26,7 +28,7 @@ class Scanner:
     def get_frame_by_image(self, image):
         scanner_frame = ScannerFrame()
         scanner_frame.image = image
-        barcodes = zxingcpp.read_barcodes(scanner_frame.image)
+        barcodes = zxingcpp.read_barcodes(scanner_frame.image, formats=FORMATS)
         scanner_frame.codes.clear()
         for barcode in barcodes:
             self.draw_bounding_box(scanner_frame.image, barcode)
